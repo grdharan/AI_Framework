@@ -1,18 +1,27 @@
 pipeline {
     agent any
-
     stages {
-
-        stage('Build & Test') {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Test') {
             steps {
                 bat 'mvn clean test'
             }
         }
     }
-
     post {
         always {
-            archiveArtifacts artifacts: 'target/**/*', allowEmptyArchive: true
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'reports',
+                reportFiles: 'ExtentReport.html',
+                reportName: 'Extent Report'
+            ])
         }
     }
 }
